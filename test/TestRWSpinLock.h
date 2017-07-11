@@ -11,8 +11,8 @@ public:
     void test_1(){
         const int count = 10;
         using namespace threading;
-        using Lock = RWSpinLock;
-        RWSpinLock lock;
+        using Lock = RWSpinLockReaderBiased;
+        Lock lock;
 
         int counter = 0;
 
@@ -49,11 +49,14 @@ public:
 
     void test_shared_lock(){
         using namespace threading;
-        using Lock = RWSpinLock;
-        RWSpinLock lock;
+        //using Lock = RWSpinLockReaderBiased;
+        using Lock = RWSpinLockWriterBiased;
+        Lock lock;
 
         int counter = 0;
         std::thread t1([&](){
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            std::cout << "t1" << std::endl;
             {
                 std::shared_lock<Lock> l(lock);
                 std::cout << "t1 begin" << counter << std::endl;
@@ -62,6 +65,8 @@ public:
             }
         });
         std::thread t2([&](){
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+            std::cout << "t2" << std::endl;
             {
                 std::shared_lock<Lock> l(lock);
                 std::cout << "t2 begin" << counter << std::endl;
@@ -71,17 +76,72 @@ public:
         });
 
         std::thread t3([&](){
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            std::cout << "t3" << std::endl;
             {
                 std::unique_lock<Lock> l(lock);
+                counter++;
                 std::cout << "unique_lock begin" << counter << std::endl;
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 std::cout << "unique_lock end" << counter << std::endl;
+            }
+        });
+
+        std::thread t4([&](){
+            std::this_thread::sleep_for(std::chrono::milliseconds(400));
+            std::cout << "t4" << std::endl;
+            {
+                std::unique_lock<Lock> l(lock);
+                counter++;
+                std::cout << "unique_lock2 begin" << counter << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                std::cout << "unique_lock2 end" << counter << std::endl;
+            }
+        });
+
+        std::thread t5([&](){
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            std::cout << "t5" << std::endl;
+            {
+                std::shared_lock<Lock> l(lock);
+                std::cout << "shared_lock t5 begin" << counter << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                std::cout << "shared_lock t5 end" << counter << std::endl;
+            }
+        });
+
+
+        std::thread t6([&](){
+            std::this_thread::sleep_for(std::chrono::milliseconds(600));
+            std::cout << "t6" << std::endl;
+            {
+                std::unique_lock<Lock> l(lock);
+                counter++;
+                std::cout << "unique_lock6 begin" << counter << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                std::cout << "unique_lock6 end" << counter << std::endl;
+            }
+        });
+
+        std::thread t7([&](){
+            std::this_thread::sleep_for(std::chrono::milliseconds(700));
+            std::cout << "t7" << std::endl;
+            {
+                std::shared_lock<Lock> l(lock);
+                std::cout << "shared_lock7 begin" << counter << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                std::cout << "shared_lock7 end" << counter << std::endl;
             }
         });
 
         t1.join();
         t2.join();
         t3.join();
+        t4.join();
+        t5.join();
+        t6.join();
+        t7.join();
+
     }
 
     void test_all(){
