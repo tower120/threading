@@ -11,7 +11,7 @@ public:
     void test_1(){
         const int count = 10;
         using namespace threading;
-        using Lock = RWSpinLockReaderBiased;
+        using Lock = RWSpinLockReaderBiased<>;
         Lock lock;
 
         int counter = 0;
@@ -34,7 +34,6 @@ public:
 
         std::thread t3([&](){
 
-
             for(int i = 0; i<count;i++) {
                 std::unique_lock<Lock> l(lock);
                 counter = i;
@@ -49,11 +48,22 @@ public:
 
     void test_shared_lock(){
         using namespace threading;
-        //using Lock = RWSpinLockReaderBiased;
-        using Lock = RWSpinLockWriterBiased;
+        //using Lock = RWSpinLockReaderBiased<>;
+        using Lock = RWSpinLockWriterBiased<>;
         Lock lock;
 
         int counter = 0;
+        std::thread t0([&](){
+            std::cout << "t0" << std::endl;
+            {
+                std::unique_lock<Lock> l(lock);
+                counter++;
+                std::cout << "unique_lock0 begin" << counter << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                std::cout << "unique_lock0 end" << counter << std::endl;
+            }
+        });
+
         std::thread t1([&](){
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
             std::cout << "t1" << std::endl;
@@ -134,6 +144,7 @@ public:
             }
         });
 
+        t0.join();
         t1.join();
         t2.join();
         t3.join();
@@ -141,12 +152,24 @@ public:
         t5.join();
         t6.join();
         t7.join();
+    }
 
+    void test_upgrade(){
+        using namespace threading;
+        using Lock = RWSpinLockWriterBiased<>;
+        Lock lock;
+
+        std::cout << "1";
+        std::unique_lock<Lock> ul(lock);
+        std::cout << "2";
+        std::shared_lock<Lock> sl( upgrade_lock<Lock>(std::move(ul)) );
+        std::cout << "3";
     }
 
     void test_all(){
         //test_1();
         test_shared_lock();
+        //test_upgrade();
     }
 };
 
