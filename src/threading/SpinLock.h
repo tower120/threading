@@ -7,7 +7,7 @@
 
 namespace threading {
 
-	template<SpinLockMode mode = SpinLockMode::Adpative>
+	template<SpinLockMode mode = SpinLockMode::Adaptive>
 	class SpinLock {
 		std::atomic_flag spinLock = ATOMIC_FLAG_INIT;
 

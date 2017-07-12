@@ -3,14 +3,14 @@
 #include <thread>
 
 namespace threading {
-    enum class SpinLockMode { Nonstop, Yield, Sleep, Adpative };
+    enum class SpinLockMode { Nonstop, Yield, Sleep, Adaptive };
 
 namespace details{
 namespace SpinLockSpinner{
 
-    template<SpinLockMode mode = SpinLockMode::Adpative, class Closure>
+    template<SpinLockMode mode = SpinLockMode::Adaptive, class Closure>
     static void spinWhile(Closure&& closure){
-        if (mode == SpinLockMode::Adpative) {
+        if (mode == SpinLockMode::Adaptive) {
             // fast return
             if (!closure()) {
                 return;
@@ -18,14 +18,14 @@ namespace SpinLockSpinner{
 
             while (true) {
                 // 1. first as spinner
-                for (int i = 0; i < 40; i++) {
+                for (int i = 0; i < 100; i++) {
                     if (!closure()) {
                         return;
                     }
                 }
 
                 // 2. then add some yield
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 1000; i++) {
                     if (!closure()) {
                         return;
                     }
