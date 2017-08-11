@@ -69,6 +69,28 @@ namespace threading{
             write_now.store(false, std::memory_order_release);
         }
 
+
+        bool try_lock() {
+            // fast fail path
+            if(readers_count.load(std::memory_order_acquire) != 0){
+                return false;
+            }
+
+            const bool was_locked = write_now.exchange(true, std::memory_order_acquire);
+            if (was_locked) {
+                return false;
+            }
+
+            if(readers_count.load(std::memory_order_acquire) == 0){
+                return true;
+            } else {
+                //restore write_now state
+                unlock();
+                return false;
+            }
+        }
+
+
         void lock_shared() {
             while(true) {
                 // wait for unlock

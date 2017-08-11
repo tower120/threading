@@ -9,4 +9,5 @@ cmake-build-release
 ## Visual Studio
 #################
 .vs
+.vscode
 CMakeSettings.json
