@@ -2,6 +2,8 @@
 
 #include <atomic>
 
+#include <shared_mutex> // for std::shared_lock
+
 #include "details/SpinLockSpinner.h"
 
 
