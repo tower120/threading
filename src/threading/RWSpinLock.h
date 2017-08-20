@@ -46,9 +46,9 @@ namespace threading{
     // Safe to use if lock -> shared_lock (updates) always.
     // Use only one cmpxchg for lock/unlock
     // and one "lock; xaddl" for shared_lock/shared_unlock
-    template<SpinLockMode mode = SpinLockMode::Adaptive>
+    template<SpinLockMode mode = SpinLockMode::Adaptive, class Counter = unsigned int>
     class RWSpinLockWriterBiased{
-        std::atomic<int>  readers_count{0};
+        std::atomic<Counter>  readers_count{0};
         std::atomic<bool> write_now{false};
     public:
         RWSpinLockWriterBiased(){}
@@ -131,9 +131,9 @@ namespace threading{
 
     // Same as WriterBiased, but reader biased. Writer may never have a chance, if there is always reader queue.
     // lock -> shared_lock update will not help here.
-    template<SpinLockMode mode = SpinLockMode::Adaptive>
+    template<SpinLockMode mode = SpinLockMode::Adaptive, class Counter = unsigned int>
     class RWSpinLockReaderBiased {
-        std::atomic<int> readers_count{0};
+        std::atomic<Counter> readers_count{0};
         std::atomic<bool> write_now{false};
     public:
         RWSpinLockReaderBiased(){}
