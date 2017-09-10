@@ -7,5 +7,5 @@ set(CMAKE_CXX_FLAGS "-std=c++1z")
 
 include_directories(../src)
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp ../src/threading/ThreadExecutor.h TestThreadExecutor.h)
 add_executable(threading_test ${SOURCE_FILES})
