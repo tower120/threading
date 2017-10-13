@@ -16,6 +16,10 @@ namespace threading {
 		SpinLock(const SpinLock&) = delete;
 		SpinLock(SpinLock&&) = delete;
 
+		bool try_lock(){
+			return !spinLock.test_and_set(std::memory_order_acquire);
+		}
+
 		void lock() {
             details::SpinLockSpinner::spinWhile([&](){
                 return spinLock.test_and_set(std::memory_order_acquire);
