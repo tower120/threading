@@ -2,12 +2,13 @@
 #define THREADING_TEST_TESTRECURSIVESPINLOCK_H
 
 #include <mutex>
-#include <threading/RecursiveSpinLock.h>
+#include <threading/Recursive.h>
+#include <threading/RWSpinLock.h>
 
 struct TestRecursiveSpinLock{
     void test_lock_unlock(){
         using namespace threading;
-        RecursiveSpinLock lock;
+        Recursive<RWSpinLock> lock;
 
         {
             std::unique_lock l(lock);

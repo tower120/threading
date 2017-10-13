@@ -1,12 +1,15 @@
 #pragma once
 
-#include "SpinLock.h"
+/// Use as follow:
+///
+///     Recursive<SpinLock>
+///     Recursive<RWSpinLock>
 
 namespace threading{
 
-    template<SpinLockMode mode = SpinLockMode::Adaptive>
-    class RecursiveSpinLock : public SpinLock<mode>{
-        using Base = SpinLock<mode>;
+    template<class spin_lock_t>
+    class Recursive : public spin_lock_t{
+        using Base = spin_lock_t;
         inline static thread_local std::size_t level{0};
     public:
         using Base::Base;
