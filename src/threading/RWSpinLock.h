@@ -93,6 +93,45 @@ namespace threading{
         }
 
 
+        bool try_lock_shared(){
+            if (write_now.load(std::memory_order_acquire) == true) return false;
+
+            readers_count.fetch_add(1, std::memory_order_acquire);
+
+            // Very rare case
+            if (!write_now.load(std::memory_order_acquire)){
+                // all ok
+                return true;
+            } else {
+                // locked while "transaction"? Fallback.
+                unlock_shared();
+                return false;
+            }
+        }
+
+
+        bool try_upgrade_shared_to_unique(){
+            // fast fail path
+            if(readers_count.load(std::memory_order_acquire) != 1){
+                return false;
+            }
+
+            const bool was_locked = write_now.exchange(true, std::memory_order_acquire);
+            if (was_locked) {
+                return false;
+            }
+
+            if(readers_count.load(std::memory_order_acquire) == 1){
+                unlock_shared();
+                return true;
+            } else {
+                //restore write_now state
+                unlock();
+                return false;
+            }
+        }
+
+
         void lock_shared() {
             while(true) {
                 // wait for unlock
