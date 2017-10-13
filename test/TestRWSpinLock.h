@@ -166,10 +166,56 @@ public:
         std::cout << "3";
     }
 
+
+    void benchmark_spinlock_vs_fetch_add(){
+        using namespace threading;
+        using Lock = RWSpinLockWriterBiased<>;
+        Lock lock;
+
+
+        auto measure = [](auto&& closure){
+            using namespace std;
+            using namespace std::chrono;
+
+            high_resolution_clock::time_point t1 = high_resolution_clock::now();
+            closure();
+            high_resolution_clock::time_point t2 = high_resolution_clock::now();
+            const auto duration = duration_cast<microseconds>(t2 - t1).count();
+            return duration;
+        };
+
+        {
+            const auto duration = measure([&]() {
+                const int count = 100'000;
+                for (int i = 0; i < count; i++) {
+                    std::unique_lock<Lock> l(lock);
+                }
+
+            });
+            std::cout << duration << std::endl;
+        }
+
+        {
+            std::atomic<unsigned int> n, j;
+            const auto duration = measure([&]() {
+                const int count = 100'000;
+                for (int i = 0; i < count; i++) {
+                    n.fetch_add(1);
+                    n.fetch_sub(1);
+                    //std::unique_lock<Lock> l(lock);
+                }
+
+            });
+            std::cout << duration << std::endl;
+        }
+
+    }
+
     void test_all(){
         //test_1();
-        test_shared_lock();
+        //test_shared_lock();
         //test_upgrade();
+        benchmark_spinlock_vs_fetch_add();
     }
 };
 
