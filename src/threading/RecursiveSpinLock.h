@@ -12,17 +12,23 @@ namespace threading{
         using Base::Base;
 
         bool try_lock(){
-            level++;
+            if (level==0) {
+                const bool locked = Base::try_lock();
+                if (locked){
+                    level++;
+                }
+                return locked;
+            }
 
-            if (level==1)
-                Base::try_lock();
+            return true;
         }
 
         void lock(){
-            level++;
-
-            if (level==1)
+            if (level==0){
                 Base::lock();
+            }
+
+            level++;
         }
 
 
