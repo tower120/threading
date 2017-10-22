@@ -10,35 +10,40 @@ namespace threading{
     template<class spin_lock_t>
     class Recursive : public spin_lock_t{
         using Base = spin_lock_t;
-        inline static thread_local std::size_t level{0};
+        inline static thread_local std::size_t m_level{0};
     public:
         using Base::Base;
 
+        std::size_t level() const{
+            return m_level;
+        }
+
         bool try_lock(){
-            if (level==0) {
+            if (m_level==0) {
                 const bool locked = Base::try_lock();
                 if (locked){
-                    level++;
+                    m_level++;
                 }
                 return locked;
             }
 
+            m_level++;
             return true;
         }
 
         void lock(){
-            if (level==0){
+            if (m_level==0){
                 Base::lock();
             }
 
-            level++;
+            m_level++;
         }
 
 
         void unlock(){
-            level--;
+            m_level--;
 
-            if (level==0)
+            if (m_level==0)
                 Base::unlock();
         }
     };
