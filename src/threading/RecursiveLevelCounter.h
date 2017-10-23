@@ -20,9 +20,9 @@ namespace threading {
         struct is_recursive<threading::Recursive<T>> : std::true_type {};
     }
 
-    template<class recursive_spinlock_t>
+    template<class recursive_spinlock_t, class level_t = unsigned int>
     class RecursiveLevelCounter : public recursive_spinlock_t{
-        std::size_t m_level{0};                // protected by recursive_spinlock_t
+        level_t m_level{0};                // protected by recursive_spinlock_t
         using Base = recursive_spinlock_t;
     public:
         using Base::Base;

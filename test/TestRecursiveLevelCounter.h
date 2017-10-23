@@ -13,8 +13,10 @@ struct TestRecursiveLevelCounter{
     void test_all(){
         using namespace threading;
 
-        using Lock = RecursiveLevelCounter<Recursive<RWSpinLock>>;
+        using Lock = RecursiveLevelCounter< Recursive<RWSpinLockWriterBiased<SpinLockMode::Adaptive, unsigned short>>, unsigned short>;
         Lock lock;
+
+        std::cout << sizeof(Lock) << std::endl;
 
         {
             std::unique_lock l1(lock);
