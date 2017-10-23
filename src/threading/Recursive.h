@@ -14,8 +14,8 @@ namespace threading{
     public:
         using Base::Base;
 
-        std::size_t level() const{
-            return m_level;
+        bool is_locked() const{
+            return m_level>0;
         }
 
         bool try_lock(){

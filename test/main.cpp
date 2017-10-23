@@ -1,11 +1,13 @@
 #include <iostream>
 
+#include "TestRecursiveLevelCounter.h"
 #include "TestRecursiveSpinLock.h"
-//#include "TestRWSpinLock.h"
-//#include "TestThreadExecutor.h"
+#include "TestRWSpinLock.h"
+#include "TestThreadExecutor.h"
 
 int main() {
-    TestRecursiveSpinLock().test_all();
+    TestRecursiveLevelCounter().test_all();
+    //TestRecursiveSpinLock().test_all();
     //TestRWSpinLock().test_all();
     //TestThreadExecutor().test_all();
 
