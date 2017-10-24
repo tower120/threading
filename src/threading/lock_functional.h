@@ -17,7 +17,7 @@
 namespace threading{
 
     template< class GetLockPtr1, class GetLockPtr2>
-    auto lock_functional(GetLockPtr1&& get_lock_ptr1, GetLockPtr2&& get_lock_ptr2){
+    static auto lock_functional(GetLockPtr1&& get_lock_ptr1, GetLockPtr2&& get_lock_ptr2){
         using Mutex1 = std::remove_pointer_t<decltype(get_lock_ptr1())>;
         using Mutex2 = std::remove_pointer_t<decltype(get_lock_ptr2())>;
 
