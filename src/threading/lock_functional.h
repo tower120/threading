@@ -3,6 +3,7 @@
 #include <thread>
 
 // std::lock like, accept closures which returns pointers to Lockables, or nullptr
+// return tuple of std::unique_lock
 /*
     std::mutex m1, m2;
     bool b;
