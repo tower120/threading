@@ -1,6 +1,7 @@
 #pragma once
 
 #include <thread>
+#include <optional>
 
 // std::lock like, accept closures which returns pointers to Lockables, or nullptr
 // return tuple of std::unique_lock
@@ -8,10 +9,13 @@
     std::mutex m1, m2;
     bool b;
 
-    auto l = lock_functional(
+    auto l = lock_all_functional(
         [&](){ return &m1; },
         [&](){ return (b ? nullptr : &m2); }
     );
+    if (!l) {
+        // lock fail.
+    }
  */
 
 namespace threading{
@@ -52,5 +56,20 @@ namespace threading{
             return Ret( std::move(lock1), std::move(lock2) );
         }
     }
+
+
+    template< class ...GetLockPtrs>
+    static auto lock_all_functional(GetLockPtrs&&... get_lock_ptrs){
+        auto locks_tuple = lock_functional(std::forward<GetLockPtrs>(get_lock_ptrs)...);
+        using LocksTuple = decltype(locks_tuple);
+        using Ret = std::optional<LocksTuple>;
+        const auto& lastLock = std::get<std::tuple_size_v<LocksTuple>-1>(locks_tuple);
+        if (!lastLock){
+            return Ret{};
+        } else {
+            return Ret{std::move(locks_tuple)};
+        }
+
+    };
 
 }
