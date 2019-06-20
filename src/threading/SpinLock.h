@@ -21,7 +21,7 @@ namespace threading {
 		}
 
 		void lock() {
-            details::SpinLockSpinner::spinWhile([&](){
+            details::SpinLockSpinner::spinWhile<mode>([&](){
                 return spinLock.test_and_set(std::memory_order_acquire);
             });
 		}
